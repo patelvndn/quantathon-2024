@@ -84,15 +84,13 @@ plt.show()
 
 # LONG
 p = [row[4] for row in data]
+# Moving averages
 ma50 = [np.mean(p[i-49:i]) for i in range(50, len(p))][50:]
 ma100 = [np.mean(p[i-99:i]) for i in range(100, len(p))]
+
+# dates and prices for the last 100 days
 d1 = dates[100:]
 p1 = p[100:]
-print(len(d1))
-print(len(p1))
-print(len(ma50))
-print(len(ma100))
-
 
 buys = {}
 buyslist = []
@@ -107,6 +105,7 @@ for i in range(20, len(p1)):
     bt = p1[i]+2*np.std(p1[i-20:i])
     bl = p1[i]-2*np.std(p1[i-20:i])
 
+    # IF entering the market / exiting the market
     if current:
         if ma50[i-2] > ma50[i-1] and ma50[i-1] < ma50[i]:
             condition1 = True
@@ -124,9 +123,9 @@ for i in range(20, len(p1)):
             sellslist.append(round(p1[i], 3))
 
 
+# Calculating returns
 total = 10000
 for (x, y, d) in zip(buyslist, sellslist, dateslist):
-    #     print(round((y-x)/x,3)*100)
     total *= 1+round((y-x)/x, 3)
     alpha[d] = 1+round((y-x)/x, 3)
 print(round(total, 3))
@@ -185,6 +184,8 @@ print(round(total_f, 2))
 
 figs, axs = plt.subplots(1, 2, figsize=(15, 6))
 
+
+# Plotting our
 axs[0].plot(dates, cumulative_returns, marker='o',
             linestyle='-', label='Profits')
 axs[0].set_xlabel('Year')
