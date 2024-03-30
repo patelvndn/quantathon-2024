@@ -12,10 +12,69 @@ closing_prices = [row[4] for row in data]
 
 # Step 2: Define sliding window length and standard deviation multiplier
 moving_avg = 50
-std_dev_multiplier = 2
 
-# Step 3: Compute moving average and standard deviation
+# Step 3: Compute moving average and standard deviation for window size 50
 moving_averages = []
+
+
+# Moving averages for window size 50
+for i in range(len(closing_prices) - moving_avg + 1):
+    window_prices = closing_prices[i:i + moving_avg]
+    # Compute moving average
+    moving_avg_price = np.mean(window_prices)
+    moving_averages.append(moving_avg_price)
+
+
+# Step 4: Plotting for window size 50
+plt.figure(figsize=(10, 6))
+
+# Plotting closing prices
+plt.plot(dates[moving_avg-1:], closing_prices[moving_avg-1:],
+         label='Closing Prices')
+
+# Plotting moving average
+plt.plot(dates[moving_avg-1:], moving_averages, color='red',
+         label=f'{moving_avg}-Day Moving Average')
+
+
+# Adding labels and title
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('Moving Average and Bollinger Bands (Window Size = 50)')
+plt.legend()
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.tight_layout()
+
+
+# Step 5: Compute moving average and standard deviation for window size 100
+moving_avg = 100
+moving_averages_100 = []
+
+# Moving averages for window size 100
+for i in range(len(closing_prices) - moving_avg + 1):
+    window_prices = closing_prices[i:i + moving_avg]
+    # Compute moving average
+    moving_avg_price = np.mean(window_prices)
+    moving_averages_100.append(moving_avg_price)
+
+
+# Plotting moving average
+plt.plot(dates[moving_avg-1:], moving_averages_100,
+         color='blue', label=f'{moving_avg}-Day Moving Average')
+
+# Adding labels and title
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('Moving Average and Bollinger Bands (Window Size = 100)')
+plt.legend()
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.tight_layout()
+
+
+moving_avg = 20
+std_dev_multiplier = 2
 upper_bands = []
 lower_bands = []
 
@@ -24,7 +83,6 @@ for i in range(len(closing_prices) - moving_avg + 1):
 
     # Compute moving average
     moving_avg_price = np.mean(window_prices)
-    moving_averages.append(moving_avg_price)
 
     # Compute standard deviation
     std_dev = np.std(window_prices)
@@ -36,33 +94,12 @@ for i in range(len(closing_prices) - moving_avg + 1):
     upper_bands.append(upper_band)
     lower_bands.append(lower_band)
 
-# Step 4: Plotting
-plt.figure(figsize=(10, 6))
+plt.plot(dates[moving_avg-1:], upper_bands,
+         color='cyan', linestyle='--', label='Upper Band')
+plt.plot(dates[moving_avg-1:], lower_bands,
+         color='cyan', linestyle='--', label='Lower Band')
 
-# Plotting closing prices
-plt.plot(dates[moving_avg-1:], closing_prices[moving_avg-1:],
-         label='Closing Prices')
-
-# Plotting moving average
-plt.plot(dates[moving_avg-1:], moving_averages, color='red',
-         label=f'{moving_avg}-Day Moving Average')
-
-# Plotting upper and lower bands
-plt.plot(dates[moving_avg-1:], upper_bands, color='green',
-         linestyle='--', label='Upper Band')
-plt.plot(dates[moving_avg-1:], lower_bands, color='green',
-         linestyle='--', label='Lower Band')
-
-# Step 5: Adding labels and title
-plt.xlabel('Date')
-plt.ylabel('Price')
-plt.title('Moving Average and Bollinger Bands')
 plt.legend()
 
-# Step 6: Rotating x-axis labels for better readability
-plt.xticks(rotation=45)
-
-# Step 7: Display the plot
-plt.grid(True)
-plt.tight_layout()
+# Show all plots at once
 plt.show()
