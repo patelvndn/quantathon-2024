@@ -8,109 +8,85 @@ data = np.genfromtxt('CLF_data.csv', delimiter=',',
 
 # Extracting dates and closing prices
 dates = [datetime.datetime.strptime(row[0], "%Y-%m-%d") for row in data]
+global_dates = [datetime.datetime.strptime(row[0], "%Y-%m-%d") for row in data]
+
 closing_prices = [row[4] for row in data]
-
-# Step 2: Define sliding window length and standard deviation multiplier
-moving_avg = 50
-
-# Step 3: Compute moving average and standard deviation for window size 50
-moving_averages = []
+alpha = {}
 
 
-# Moving averages for window size 50
-for i in range(len(closing_prices) - moving_avg + 1):
-    window_prices = closing_prices[i:i + moving_avg]
-    # Compute moving average
-    moving_avg_price = np.mean(window_prices)
-    moving_averages.append(moving_avg_price)
+def moving_avg(window, clr='blue'):
+    moving_avg = window
+    moving_averages = []
+
+    # Moving averages for window size 50
+    for i in range(len(closing_prices) - moving_avg + 1):
+        window_prices = closing_prices[i:i + moving_avg]
+        # Compute moving average
+        moving_avg_price = np.mean(window_prices)
+        moving_averages.append(moving_avg_price)
+
+    # Plotting moving average
+    plt.plot(dates[moving_avg-1:], moving_averages, color=clr,
+             label=f'{moving_avg}-Day Moving Average')
+
+    # Adding labels and title
+    plt.xlabel('Date')
+    plt.ylabel('Price')
+    plt.title(f'Moving Average and Bollinger Bands (Window Size = {window})')
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.tight_layout()
 
 
-# Step 4: Plotting for window size 50
+def bollinger_bands(window, std_dev_multiplier):
+    moving_avg = window
+    upper_bands = []
+    lower_bands = []
+
+    for i in range(len(closing_prices) - moving_avg + 1):
+        window_prices = closing_prices[i:i + moving_avg]
+
+        # Compute moving average
+        moving_avg_price = np.mean(window_prices)
+
+        # Compute standard deviation
+        std_dev = np.std(window_prices)
+
+        # Compute upper and lower bands
+        upper_band = moving_avg_price + std_dev_multiplier * std_dev
+        lower_band = moving_avg_price - std_dev_multiplier * std_dev
+
+        upper_bands.append(upper_band)
+        lower_bands.append(lower_band)
+
+    plt.plot(dates[moving_avg-1:], upper_bands,
+             color='cyan', linestyle='--', label='Upper Band')
+    plt.plot(dates[moving_avg-1:], lower_bands,
+             color='cyan', linestyle='--', label='Lower Band')
+
+    plt.legend()
+
+
+# Plotting moving averages for different window sizes
 plt.figure(figsize=(10, 6))
-
-# Plotting closing prices
-plt.plot(dates[moving_avg-1:], closing_prices[moving_avg-1:],
-         label='Closing Prices')
-
-# Plotting moving average
-plt.plot(dates[moving_avg-1:], moving_averages, color='red',
-         label=f'{moving_avg}-Day Moving Average')
-
-
-# Adding labels and title
-plt.xlabel('Date')
-plt.ylabel('Price')
-plt.title('Moving Average and Bollinger Bands (Window Size = 50)')
-plt.legend()
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.tight_layout()
-
-
-# Step 5: Compute moving average and standard deviation for window size 100
-moving_avg = 100
-moving_averages_100 = []
-
-# Moving averages for window size 100
-for i in range(len(closing_prices) - moving_avg + 1):
-    window_prices = closing_prices[i:i + moving_avg]
-    # Compute moving average
-    moving_avg_price = np.mean(window_prices)
-    moving_averages_100.append(moving_avg_price)
-
-
-# Plotting moving average
-plt.plot(dates[moving_avg-1:], moving_averages_100,
-         color='blue', label=f'{moving_avg}-Day Moving Average')
-
-# Adding labels and title
-plt.xlabel('Date')
-plt.ylabel('Price')
-plt.title('Moving Average and Bollinger Bands (Window Size = 100)')
-plt.legend()
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.tight_layout()
-
-
-moving_avg = 20
-std_dev_multiplier = 2
-upper_bands = []
-lower_bands = []
-
-for i in range(len(closing_prices) - moving_avg + 1):
-    window_prices = closing_prices[i:i + moving_avg]
-
-    # Compute moving average
-    moving_avg_price = np.mean(window_prices)
-
-    # Compute standard deviation
-    std_dev = np.std(window_prices)
-
-    # Compute upper and lower bands
-    upper_band = moving_avg_price + std_dev_multiplier * std_dev
-    lower_band = moving_avg_price - std_dev_multiplier * std_dev
-
-    upper_bands.append(upper_band)
-    lower_bands.append(lower_band)
-
-plt.plot(dates[moving_avg-1:], upper_bands,
-         color='cyan', linestyle='--', label='Upper Band')
-plt.plot(dates[moving_avg-1:], lower_bands,
-         color='cyan', linestyle='--', label='Lower Band')
-
-plt.legend()
-
-# Show all plots at once
+plt.plot(dates, closing_prices, label='Closing Prices')
+moving_avg(50, 'red')
+moving_avg(100, 'blue')
 plt.show()
 
+# Plotting Bollinger Bands with moving average window size 20
+plt.plot(dates, closing_prices,
+         label='Closing Prices')
+moving_avg(20, 'red')
+bollinger_bands(20, 2)
+plt.show()
 
 # LONG
-d = [datetime.datetime.strptime(row[0], "%Y-%m-%d") for row in data]
 p = [row[4] for row in data]
 ma50 = [np.mean(p[i-49:i]) for i in range(50, len(p))][50:]
 ma100 = [np.mean(p[i-99:i]) for i in range(100, len(p))]
-d1 = d[100:]
+d1 = dates[100:]
 p1 = p[100:]
 print(len(d1))
 print(len(p1))
@@ -148,7 +124,6 @@ for i in range(20, len(p1)):
             sellslist.append(round(p1[i], 3))
 
 
-alpha = {}
 total = 10000
 for (x, y, d) in zip(buyslist, sellslist, dateslist):
     #     print(round((y-x)/x,3)*100)
@@ -207,11 +182,45 @@ for date, return_value in alpha_sorted:
     cumulative_returns.append(total_f)
 
 print(round(total_f, 2))
+
+figs, axs = plt.subplots(1, 2, figsize=(15, 6))
+
+axs[0].plot(dates, cumulative_returns, marker='o',
+            linestyle='-', label='Profits')
+axs[0].set_xlabel('Year')
+axs[0].set_ylabel('Portfolio Total ($)')
+axs[0].set_title('Portfolio Profits')
+axs[0].tick_params(axis='x', rotation=45)
+axs[0].grid(True)
+axs[0].legend()
+
+# Plotting on the second subplot
+axs[1].plot(global_dates, closing_prices, marker='o',
+            linestyle='-', label='Closing Prices')
+axs[1].set_xlabel('Date')
+axs[1].set_ylabel('Price')
+axs[1].set_title('Closing Prices')
+axs[1].tick_params(axis='x', rotation=45)
+axs[1].grid(True)
+axs[1].legend()
+
+
+plt.tight_layout()
+plt.show()
+
+
 plt.figure(figsize=(10, 6))
-plt.plot(dates, cumulative_returns, marker='o', linestyle='-')
-plt.xlabel('Year')
-plt.ylabel('Portfolio Total ($)')
-plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+plt.scatter(dateslist_s, shortslist, marker='o', label='Entry', color='green')
+plt.scatter(sellsdatelist_s, shortslist, marker='x',
+            label='Exit', color='red')
+# plt.plot(dateslist, sellslist, label='Buys')
+plt.plot(global_dates, closing_prices, label='Closing Prices',
+         color='blue', linestyle='--')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('Shorts and Buys')
+plt.xticks(rotation=45)
+plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
