@@ -82,7 +82,6 @@ moving_avg(20, 'red')
 bollinger_bands(20, 2)
 plt.show()
 
-# LONG
 p = [row[4] for row in data]
 # Moving averages
 ma50 = [np.mean(p[i-49:i]) for i in range(50, len(p))][50:]
@@ -92,43 +91,45 @@ ma100 = [np.mean(p[i-99:i]) for i in range(100, len(p))]
 d1 = dates[100:]
 p1 = p[100:]
 
-buys = {}
-buyslist = []
-sells = {}
-sellslist = []
-dateslist = []
-current = True
-condition1 = False
 
-for i in range(20, len(p1)):
-    # bollinger band definition
-    bt = p1[i]+2*np.std(p1[i-20:i])
-    bl = p1[i]-2*np.std(p1[i-20:i])
+# LONG
+# buys = {}
+# buyslist = []
+# sells = {}
+# sellslist = []
+# dateslist = []
+# current = True
+# condition1 = False
 
-    # IF entering the market / exiting the market
-    if current:
-        if ma50[i-2] > ma50[i-1] and ma50[i-1] < ma50[i]:
-            condition1 = True
-        if condition1:
-            if ma100[i-1] < ma100[i] and p1[i] > ma100[i]:
-                buys[d1[i]] = round(p1[i], 3)
-                dateslist.append(d1[i])
-                buyslist.append(round(p1[i], 3))
-                current = False
-    else:
-        if p1[i] >= bt or p1[i] <= buyslist[-1]*0.98 or p1[i] < ma50[i] or ma50[i] < ma50[i-1]:
-            current = True
-            condition1 = False
-            sells[d1[i]] = d1[i]
-            sellslist.append(round(p1[i], 3))
+# for i in range(20, len(p1)):
+#     # bollinger band definition
+#     bt = p1[i]+2*np.std(p1[i-20:i])
+#     bl = p1[i]-2*np.std(p1[i-20:i])
+
+#     # IF entering the market / exiting the market
+#     if current:
+#         if ma50[i-2] > ma50[i-1] and ma50[i-1] < ma50[i]:
+#             condition1 = True
+#         if condition1:
+#             if ma100[i-1] < ma100[i] and p1[i] > ma100[i]:
+#                 buys[d1[i]] = round(p1[i], 3)
+#                 dateslist.append(d1[i])
+#                 buyslist.append(round(p1[i], 3))
+#                 current = False
+#     else:
+#         if p1[i] >= bt or p1[i] <= buyslist[-1]*0.98 or p1[i] < ma50[i] or ma50[i] < ma50[i-1]:
+#             current = True
+#             condition1 = False
+#             sells[d1[i]] = d1[i]
+#             sellslist.append(round(p1[i], 3))
 
 
 # Calculating returns
-total = 10000
-for (x, y, d) in zip(buyslist, sellslist, dateslist):
-    total *= 1+round((y-x)/x, 3)
-    alpha[d] = 1+round((y-x)/x, 3)
-print(round(total, 3))
+# total = 10000
+# for (x, y, d) in zip(buyslist, sellslist, dateslist):
+#     total *= 1+round((y-x)/x, 3)
+#     alpha[d] = 1+round((y-x)/x, 3)
+# print(round(total, 3))
 
 
 # SHORT
